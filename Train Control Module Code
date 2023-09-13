@@ -1,0 +1,33 @@
+module train_control(
+ input clk,
+ input reset,
+ input [1:0] train_location,
+ output [1:0] train_speed,
+ output [1:0] train_stop
+);
+reg [1:0] current_location;
+reg [1:0] next_location;
+reg [1:0] speed;
+always @(posedge clk or posedge reset) begin
+ if(reset) begin
+ current_location <= 2'b00;
+ next_location <= 2'b01;
+ speed <= 2'b10;
+ end else begin
+ if(train_location == next_location) begin
+ current_location <= train_location;
+ next_location <= (train_location == 2'b00) ? 
+2'b01 : 2'b00;
+ speed <= (train_location == 2'b00) ? 2'b10 : 
+2'b01;
+ end else begin
+ current_location <= current_location;
+ next_location <= next_location;
+ speed <= speed;
+ end
+ end
+end
+assign train_speed = speed;
+assign train_stop = (train_location == current_location) ? 
+1'b1 : 1'b0;
+endmodule
