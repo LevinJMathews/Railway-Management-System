@@ -1,0 +1,49 @@
+module tb_traffic_management;
+reg clk, reset, train_arrival;
+reg [1:0] train_location;
+wire [1:0] train_speed, train_stop;
+wire platform_1, platform_2;
+train_control train_control_inst(
+ .clk(clk),
+ .reset(reset),
+ .train_location(train_location),
+ .train_speed(train_speed),
+ .train_stop(train_stop)
+);
+platform_scheduling platform_scheduling_inst(
+ .clk(clk),
+ .reset(reset),
+ .train_arrival(train_arrival),
+ .platform_1(platform_1),
+ .platform_2(platform_2)
+);
+initial begin
+ clk = 1'b0;
+ reset = 1'b1;
+ train_arrival = 1'b0;
+ train_location = 2'b00;
+ #10 reset = 1'b0;
+end
+always #5 clk = ~clk;
+always @(posedge clk) begin
+ train_location <= (train_location == 2'b00) ? 2'b01 : 
+2'b00;
+end
+initial begin
+ $monitor("Time = %d | Train Location = %b | Train 
+Speed = %b | Train Stop = %b | Platform 1 = %b | Platform 
+2 = %b", $time, train_location, train_speed, train_stop, 
+platform_1, platform_2);
+ #50 train_arrival = 1'b1;
+ #50 train_arrival = 1'b0;
+ #100 train_arrival = 1'b1;
+ #50 train_arrival = 1'b0;
+ #100 train_arrival = 1'b1;
+ #50 train_arrival = 1'b0;
+ #100 train_arrival = 1'b1;
+ #50 train_arrival = 1'b0;
+ #100 train_arrival = 1'b1;
+ #50 train_arrival = 1'b0;
+ #100 $finish;
+end
+endmodule
